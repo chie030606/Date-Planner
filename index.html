@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Quick Question 💌</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-color: #fff0f3;
+      --card-bg: #ffffff;
+      --primary: #ff4d6d;
+      --primary-hover: #ff758f;
+      --primary-light: #fff5f7;
+      --text-dark: #2b2d42;
+      --text-muted: #8d99ae;
+      --border: #ffe0e6;
+      --radius: 28px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(at 10% 10%, #ffe5ec 0px, transparent 50%),
+        radial-gradient(at 90% 90%, #ffccd5 0px, transparent 50%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.25rem;
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* Main Container Card */
+    .app-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 40px -15px rgba(255, 77, 109, 0.15);
+      border: 1px solid var(--border);
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .step {
+      display: none;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .step.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.85rem;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+      color: var(--text-dark);
+    }
+
+    p.subtext {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px -4px rgba(255, 77, 109, 0.4);
+      transition: transform 0.2s ease, background 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    /* Dodging No Button Zone */
+    .interactive-zone {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin-top: 1rem;
+      position: relative;
+      min-height: 120px;
+    }
+
+    #no-btn {
+      background: #f1f3f5;
+      color: #6c757d;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: top 0.2s ease, left 0.2s ease, transform 0.2s ease;
+      white-space: nowrap;
+      touch-action: manipulation;
+    }
+
+    input[type="date"],
+    input[type="time"] {
+      width: 100%;
+      padding: 0.85rem;
+      border-radius: 14px;
+      border: 2px solid var(--border);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      outline: none;
+      margin-bottom: 1rem;
+      background: #fff;
+      -webkit-appearance: none;
+    }
+
+    .grid-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .option-card {
+      border: 2px solid var(--border);
+      background: #fff;
+      padding: 0.85rem 0.5rem;
+      border-radius: 16px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .option-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .summary-card {
+      background: var(--primary-light);
+      border: 2px dashed var(--border);
+      border-radius: 18px;
+      padding: 1rem;
+      margin-bottom: 1.25rem;
+      text-align: left;
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .summary-icon {
+      width: 32px;
+      height: 32px;
+      background: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .game-card {
+      background: linear-gradient(135deg, #fff7fa 0%, #ffeef3 100%);
+      border: 2px solid var(--border);
+      border-radius: 18px;
+      padding: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .game-card h3 {
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+      color: var(--text-dark);
+    }
+
+    .game-hint {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .game-choice {
+      border: 2px solid var(--border);
+      background: white;
+      border-radius: 14px;
+      padding: 0.8rem 0.5rem;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .game-choice:active {
+      transform: scale(0.96);
+    }
+
+    .game-choice.correct {
+      border-color: #2e7d32;
+      background: #e8f5e9;
+    }
+
+    .game-choice.wrong {
+      border-color: #d32f2f;
+      background: #ffebee;
+    }
+
+    .game-result {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--primary);
+      min-height: 1.2rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .game-replay {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      background: var(--primary);
+      color: white;
+      padding: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .calculator-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 1000;
+    }
+
+    .calculator-overlay.active {
+      display: flex;
+    }
+
+    .calculator-card {
+      background: #ffffff;
+      border-radius: 20px;
+      width: min(100%, 320px);
+      padding: 1rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    .calculator-close {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      border: none;
+      background: #fff0f4;
+      color: var(--primary);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .calculator-card h4 {
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+      color: var(--text-dark);
+    }
+
+    .calculator-card p {
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .calculator-screen {
+      background: #111827;
+      color: white;
+      border-radius: 12px;
+      padding: 0.85rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 0.8rem;
+    }
+
+    .calculator-inputs {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .calculator-inputs input {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 0.7rem;
+      font-size: 1rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .calculator-inputs span {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .calculator-check {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 0.75rem;
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .calculator-result {
+      margin-top: 0.7rem;
+      text-align: center;
+      font-weight: 800;
+      color: var(--primary);
+      min-height: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-card">
+    
+    <!-- STEP 1 -->
+    <div class="step active" id="step-1">
+      <span class="badge">Special Invitation</span>
+      <h2>Will you go on a date with me? ✨</h2>
+      <p class="subtext">I promise good food, great conversation, and zero boring moments.</p>
+      
+      <div class="interactive-zone">
+        <button class="btn-primary" onclick="goToStep(2)">YES, ABSOLUTELY! 💕</button>
+        <button id="no-btn">No, thanks 🙈</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" id="step-2">
+      <span class="badge">Step 1 of 2</span>
+      <h2>When are you free? 🗓️</h2>
+      <p class="subtext">Pick a day and your preferred time.</p>
+
+      <input type="date" id="date-picker" />
+      <label for="time-picker" style="display:block; font-size:0.8rem; font-weight:700; color:var(--text-muted); margin-bottom:0.35rem;">Desired time</label>
+      <input type="time" id="time-picker" value="19:30" />
+
+
+      <button class="btn-primary" onclick="goToStep(3)">Continue →</button>
+    </div>
+
+    <!-- STEP 3: Activity & Food Multi-Select Grid -->
+    <div class="step" id="step-3">
+      <span class="badge">Step 2 of 2</span>
+      <h2>What are we doing? ✨</h2>
+      <p class="subtext">Select as many things as you'd like us to do!</p>
+
+      <div class="grid-options" id="activity-grid">
+        <div class="option-card selected" onclick="toggleActivity(this, '🎬 Movie Date')">🎬 Watch Movies</div>
+        <div class="option-card" onclick="toggleActivity(this, '🌊 Beach Hangout')">🌊 Beach Hangout</div>
+        <div class="option-card" onclick="toggleActivity(this, '✈️ Road Trip')">✈️ Road Trip</div>
+        <div class="option-card" onclick="toggleActivity(this, '🍝 Pasta')">🍝 Pasta</div>
+        <div class="option-card" onclick="toggleActivity(this, '🍕 Pizza')">🍕 Pizza</div>
+        <div class="option-card" onclick="toggleActivity(this, '☕ Cafe')">☕ Cafe</div>
+      </div>
+
+      <button class="btn-primary" onclick="renderSummary()">Lock It In! 🎉</button>
+    </div>
+
+    <!-- STEP 4: Success Screen -->
+    <div class="step" id="step-4">
+      <span class="badge" style="background:#e8f5e9; color:#2e7d32;">It's A Date!</span>
+      <h2>YAY!! 💕</h2>
+
+      <div class="summary-card">
+        <div class="summary-row">
+          <div class="summary-icon">📅</div>
+          <span id="sum-date">Wednesday, July 22</span>
+        </div>
+        <div class="summary-row">
+          <div class="summary-icon">⏰</div>
+          <span id="sum-time">7:30 PM</span>
+        </div>
+        <div class="summary-row">
+          <div class="summary-icon">✨</div>
+          <span id="sum-activities">🎬 Movie Date</span>
+        </div>
+      </div>
+
+      <div class="game-card">
+        <h3>Mini Game 💖</h3>
+        <p class="game-hint">Pick the box with the hidden heart!</p>
+        <div class="game-grid">
+          <button class="game-choice" onclick="pickGameChoice(0)">🌸</button>
+          <button class="game-choice" onclick="pickGameChoice(1)">✨</button>
+          <button class="game-choice" onclick="pickGameChoice(2)">🎀</button>
+          <button class="game-choice" onclick="pickGameChoice(3)">🌼</button>
+        </div>
+        <div class="game-result" id="game-result">Choose one of the boxes.</div>
+        <button class="game-replay" id="game-replay" onclick="resetGame()" style="display: none;">Play Again 💕</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="calculator-overlay" id="calculator-overlay">
+    <div class="calculator-card">
+      <button class="calculator-close" onclick="closeCalculator()">✕</button>
+      <h4>Birthday Calculator</h4>
+      <p>Add birthday month and day of the Sender </p>
+      <div class="calculator-inputs">
+        <input type="number" id="birth-month" min="1" max="12" placeholder="Month">
+        <span>+</span>
+        <input type="number" id="birth-day" min="1" max="31" placeholder="Day">
+      </div>
+      <button class="calculator-check" onclick="checkBirthdaySum()">Check</button>
+      <div class="calculator-result" id="calculator-result"></div>
+    </div>
+  </div>
+
+  <script>
+    let chosenTime = "7:30 PM";
+    let chosenActivities = new Set(["🎬 Movie Date"]);
+
+    document.getElementById('date-picker').valueAsDate = new Date();
+
+    const noBtn = document.getElementById('no-btn');
+    const timePicker = document.getElementById('time-picker');
+    const timeCards = Array.from(document.querySelectorAll('#time-grid .option-card'));
+    
+    function moveButton(e) {
+      if (e) e.preventDefault();
+      const card = document.querySelector('.app-card');
+      const cardRect = card.getBoundingClientRect();
+      
+      const x = (Math.random() - 0.5) * (cardRect.width * 0.7);
+      const y = (Math.random() - 0.5) * (cardRect.height * 0.7);
+
+      noBtn.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    noBtn.addEventListener('mouseenter', moveButton);
+    noBtn.addEventListener('touchstart', moveButton, { passive: false });
+
+    function goToStep(stepNumber) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      setTimeout(() => {
+        document.getElementById(`step-${stepNumber}`).classList.add('active');
+      }, 50);
+    }
+
+    function formatTimeLabel(value) {
+      if (!value) return 'Soon';
+      const [hours, minutes] = value.split(':').map(Number);
+      const suffix = hours >= 12 ? 'PM' : 'AM';
+      let displayHour = hours % 12;
+      if (displayHour === 0) displayHour = 12;
+      return `${displayHour}:${String(minutes).padStart(2, '0')} ${suffix}`;
+    }
+
+    function selectTime(element, value) {
+      const parentGrid = element.parentElement;
+      parentGrid.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
+      element.classList.add('selected');
+      chosenTime = value;
+      if (timePicker) {
+        const match = value.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+        if (match) {
+          let hours = parseInt(match[1], 10);
+          const minutes = match[2];
+          const suffix = match[3].toUpperCase();
+          if (suffix === 'PM' && hours < 12) hours += 12;
+          if (suffix === 'AM' && hours === 12) hours = 0;
+          timePicker.value = `${String(hours).padStart(2, '0')}:${minutes}`;
+        }
+      }
+    }
+
+    if (timePicker) {
+      timePicker.addEventListener('change', () => {
+        timeCards.forEach(card => card.classList.remove('selected'));
+        chosenTime = formatTimeLabel(timePicker.value);
+      });
+    }
+
+    function toggleActivity(element, value) {
+      if (chosenActivities.has(value)) {
+        if (chosenActivities.size > 1) { // keep at least one selected
+          chosenActivities.delete(value);
+          element.classList.remove('selected');
+        }
+      } else {
+        chosenActivities.add(value);
+        element.classList.add('selected');
+      }
+    }
+
+    function renderSummary() {
+      const rawDateVal = document.getElementById('date-picker').value;
+      let dateString = "Soon";
+
+      if (rawDateVal) {
+        const parsedDate = new Date(rawDateVal + 'T00:00:00');
+        dateString = parsedDate.toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+
+      document.getElementById('sum-date').textContent = dateString;
+      document.getElementById('sum-time').textContent = chosenTime;
+      document.getElementById('sum-activities').textContent = Array.from(chosenActivities).join(", ");
+
+      goToStep(4);
+    }
+
+    const gameChoices = Array.from(document.querySelectorAll('.game-choice'));
+    const gameResult = document.getElementById('game-result');
+    const replayButton = document.getElementById('game-replay');
+    let heartIndex = 0;
+    let gameFinished = false;
+
+    function resetGame() {
+      heartIndex = Math.floor(Math.random() * gameChoices.length);
+      gameFinished = false;
+      replayButton.style.display = 'none';
+      gameResult.textContent = 'Choose one of the boxes.';
+
+      gameChoices.forEach((button, index) => {
+        button.textContent = index === heartIndex ? '💖' : '🎁';
+        button.classList.remove('correct', 'wrong');
+        button.disabled = false;
+      });
+    }
+
+    const calculatorOverlay = document.getElementById('calculator-overlay');
+    const calculatorResult = document.getElementById('calculator-result');
+    const birthMonthInput = document.getElementById('birth-month');
+    const birthDayInput = document.getElementById('birth-day');
+
+    function openCalculator() {
+      calculatorOverlay.classList.add('active');
+      birthMonthInput.value = '';
+      birthDayInput.value = '';
+      calculatorResult.textContent = '';
+    }
+
+    function closeCalculator() {
+      calculatorOverlay.classList.remove('active');
+      calculatorResult.textContent = '';
+    }
+
+    function checkBirthdaySum() {
+      const month = Number(birthMonthInput.value);
+      const day = Number(birthDayInput.value);
+
+      if (month === 3 && day === 6) {
+        calculatorResult.textContent = 'nakakainis ka 👉👈😳';
+      } else {
+        calculatorResult.textContent = 'engggggk, depende kung 3 yan!';
+      }
+    }
+
+    function pickGameChoice(index) {
+      if (gameFinished) return;
+
+      if (index === heartIndex) {
+        gameChoices[index].textContent = '💖';
+        gameChoices[index].classList.add('correct');
+        gameResult.textContent = 'You found the hidden heart! That was adorable 😘';
+        replayButton.style.display = 'block';
+        gameFinished = true;
+        openCalculator();
+      } else {
+        gameChoices[index].textContent = '💔';
+        gameChoices[index].classList.add('wrong');
+        gameResult.textContent = 'Not this one! Try another cute box 💫';
+      }
+    }
+
+    resetGame();
+  </script>
+</body>
+</html>
